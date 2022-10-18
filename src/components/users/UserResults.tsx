@@ -1,14 +1,10 @@
-import { useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import GHContext from '../../context/github/GithubContext';
 import Spinner from '../layout/Spinner';
 import UserItem from './UserItem';
 
 export default function UserResults() {
-  const { users, loading, fetchUsers } = useContext(GHContext);
-  useEffect(() => {
-    fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { users, loading } = useContext(GHContext);
 
   if (!loading) {
     return (
