@@ -1,6 +1,6 @@
 interface action {
   type: string;
-  payload: any;
+  payload?: any;
 }
 interface state {
   users: any;
@@ -12,5 +12,9 @@ export const GHReducer = (state: state, action: action) => {
       return state;
     case 'GET_USERS':
       return { ...state, users: action.payload, loading: false };
+    case 'SET_LOADING':
+      return { ...state, loading: true };
+    case 'CLEAR_USERS':
+      return { ...state, users: [] };
   }
 };
