@@ -6,33 +6,49 @@ interface AppContextInterface {
   loading: boolean;
   searchUsers: (text: string) => Promise<void>;
   clearUsers: () => void;
+  user: any;
+  getUser: (login: string | undefined) => void;
 }
 interface Props {
   children?: ReactNode;
   // any props that come into the component
 }
 
+type login = string | undefined;
+
 const GHContext = createContext({} as AppContextInterface);
 const GH_URL = process.env.REACT_APP_GH_URL;
 const GH_TOKEN = process.env.REACT_APP_GH_TOKEN;
 
 export const GHProvider = ({ children }: Props) => {
-  const initialState = { users: [], loading: false };
+  const initialState = { users: [], loading: false, user: {} };
   const [state, dispatch] = useReducer(GHReducer, initialState);
 
   const searchUsers = async (text: string) => {
     setLoading();
     const params = new URLSearchParams({ q: text });
-
-    const test = `${GH_URL}/search/users?${params}`;
-    console.log(test);
-    const res = await fetch(test, {
+    const res = await fetch(`${GH_URL}/search/users?${params}`, {
       headers: { Authorization: `token ${GH_TOKEN}` },
     });
 
     const { items } = await res.json();
-    console.log(items);
     dispatch({ type: 'GET_USERS', payload: items });
+  };
+
+  const getUser = async (login: login) => {
+    setLoading();
+    console.log(login);
+
+    const res = await fetch(`${GH_URL}/users/${login}`, {
+      headers: { Authorization: `token ${GH_TOKEN}` },
+    });
+
+    if (res.status === 404) {
+      window.location.href = '/notfound';
+    } else {
+      const data = await res.json();
+      dispatch({ type: 'GET_USER', payload: data });
+    }
   };
 
   //Clear Users from State
@@ -43,7 +59,14 @@ export const GHProvider = ({ children }: Props) => {
 
   return (
     <GHContext.Provider
-      value={{ users: state.users, loading: state.loading, searchUsers, clearUsers }}
+      value={{
+        users: state.users,
+        loading: state.loading,
+        user: state.user,
+        searchUsers,
+        clearUsers,
+        getUser,
+      }}
     >
       {children}
     </GHContext.Provider>
