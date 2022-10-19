@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
-export default function UserItem(props: { user: { login: string; avatar_url: string } }) {
+export default function UserItem(props: {
+  user: { login: string; avatar_url: string };
+}) {
   return (
     <div className='card shadow-md compact side bg-base-100'>
       <div className='flex-row items-center space-x-4 card-body'>
@@ -16,7 +18,7 @@ export default function UserItem(props: { user: { login: string; avatar_url: str
             <h2 className='card-title'>{props.user.login}</h2>
             <Link
               className='text-base-content text-opacity-40'
-              to={`/users/${props.user.login}`}
+              to={`/user/${props.user.login}`}
             >
               Visit Profile
             </Link>
