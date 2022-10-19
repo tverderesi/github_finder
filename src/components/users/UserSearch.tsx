@@ -1,10 +1,12 @@
 import { useState, useContext } from 'react';
+import AlertContext from '../../context/alert/AlertContext';
 import GHContext from '../../context/github/GithubContext';
 
 export default function UserSearch() {
   const [text, setText] = useState('');
 
   const { users, searchUsers } = useContext(GHContext);
+  const { setAlert } = useContext(AlertContext);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
@@ -12,7 +14,7 @@ export default function UserSearch() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (text === '') {
-      alert('Please enter smth');
+      setAlert('Please enter an username to search!', 'error ');
     } else {
       searchUsers(text);
       console.log(users);
