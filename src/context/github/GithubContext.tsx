@@ -1,13 +1,21 @@
-import { createContext, useReducer, ReactNode } from 'react';
+import { useReducer, ReactNode } from 'react';
+import { GH_URL, GH_TOKEN, GHContext } from './GithubActions';
 import { GHReducer } from './GithubReducer';
 
-interface AppContextInterface {
+interface action {
+  type: string;
+  payload?: any;
+}
+export interface AppContextInterface {
   users: any[];
   loading: boolean;
-  searchUsers: (text: string) => Promise<void>;
-  clearUsers: () => void;
   user: any;
+  repos: any;
+
+  clearUsers: () => void;
   getUser: (login: string | undefined) => void;
+  getUserRepos: (login: string | undefined) => void;
+  dispatch: React.Dispatch<action>;
 }
 interface Props {
   children?: ReactNode;
@@ -16,29 +24,12 @@ interface Props {
 
 type login = string | undefined;
 
-const GHContext = createContext({} as AppContextInterface);
-const GH_URL = process.env.REACT_APP_GH_URL;
-const GH_TOKEN = process.env.REACT_APP_GH_TOKEN;
-
 export const GHProvider = ({ children }: Props) => {
-  const initialState = { users: [], loading: false, user: {} };
+  const initialState = { users: [], loading: false, user: {}, repos: {} };
   const [state, dispatch] = useReducer(GHReducer, initialState);
-
-  const searchUsers = async (text: string) => {
-    setLoading();
-    const params = new URLSearchParams({ q: text });
-    const res = await fetch(`${GH_URL}/search/users?${params}`, {
-      headers: { Authorization: `token ${GH_TOKEN}` },
-    });
-
-    const { items } = await res.json();
-    dispatch({ type: 'GET_USERS', payload: items });
-  };
 
   const getUser = async (login: login) => {
     setLoading();
-    console.log(login);
-
     const res = await fetch(`${GH_URL}/users/${login}`, {
       headers: { Authorization: `token ${GH_TOKEN}` },
     });
@@ -51,6 +42,18 @@ export const GHProvider = ({ children }: Props) => {
     }
   };
 
+  const getUserRepos = async (login: login) => {
+    setLoading();
+    const params = new URLSearchParams({ sort: 'created', per_page: '10' });
+    const res = await fetch(`${GH_URL}/users/${login}/repos`, {
+      headers: { Authorization: `token ${GH_TOKEN}` },
+    });
+
+    const data = await res.json();
+
+    dispatch({ type: 'GET_REPOS', payload: data });
+  };
+
   //Clear Users from State
   const clearUsers = () => dispatch({ type: 'CLEAR_USERS' });
 
@@ -60,12 +63,11 @@ export const GHProvider = ({ children }: Props) => {
   return (
     <GHContext.Provider
       value={{
-        users: state.users,
-        loading: state.loading,
-        user: state.user,
-        searchUsers,
+        ...state,
+        dispatch,
         clearUsers,
         getUser,
+        getUserRepos,
       }}
     >
       {children}
