@@ -4,12 +4,15 @@ import { useParams } from 'react-router-dom';
 import { FaCodepen, FaStore, FaUserFriends, FaUsers } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import Spinner from '../Spinner';
+import RepoList from '../../repos/RepoList';
 
 export default function User() {
-  const { getUser, user, loading } = useContext(GHContext);
+  const { getUser, user, loading, getUserRepos, repos } = useContext(GHContext);
   const { login } = useParams();
   useEffect(() => {
     getUser(login);
+    getUserRepos(login);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const {
     name,
@@ -164,7 +167,7 @@ export default function User() {
           </div>
         </div>
 
-        {/* <RepoList repos={repos} /> */}
+        <RepoList repos={repos} />
       </div>
     </>
   );
