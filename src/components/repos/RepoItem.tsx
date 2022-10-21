@@ -1,6 +1,7 @@
 import { FaEye, FaInfo, FaLink, FaStar, FaUtensils } from 'react-icons/fa';
+import { repoType } from '../../types/types';
 
-export default function RepoItem({ repo }: any) {
+export default function RepoItem({ repo }: { repo: repoType }) {
   const {
     name,
     description,
