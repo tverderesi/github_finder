@@ -7,7 +7,6 @@ export const GH_TOKEN = process.env.REACT_APP_GH_TOKEN;
 
 const github = axios.create({
   baseURL: GH_URL,
-  headers: { Authorization: `token ${GH_TOKEN}` },
 });
 
 export const searchUsers: searchUsersType = async text => {
